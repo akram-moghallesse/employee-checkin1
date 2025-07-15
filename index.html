@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>تسجيل دخول الموظف</title>
+  <script>
+    function sendLocation(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      const loc = `${lat},${lon}`;
+      const name = prompt("✏️ أدخل اسمك الكامل:");
+
+      const scriptUrl = "https://script.google.com/macros/s/AKfycbyO2_fkfbgDpLTM18bBA23a-nuWHoFzh1a6lHJIiU0f-_Y8-0dbrbXcPLKjL4d-Y4LG/exec"; // ← استبدل هذا بالرابط الخاص بك
+
+      fetch(`${scriptUrl}?name=${encodeURIComponent(name)}&loc=${loc}`)
+        .then(() => {
+          document.getElementById("status").innerText = "✅ تم التسجيل بنجاح";
+        })
+        .catch(() => {
+          document.getElementById("status").innerText = "❌ فشل في التسجيل";
+        });
+    }
+
+    window.onload = function () {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(sendLocation, (err) => {
+          document.getElementById("status").innerText = "❌ فشل تحديد الموقع: " + err.message;
+        });
+      } else {
+        document.getElementById("status").innerText = "❌ المتصفح لا يدعم GPS";
+      }
+    };
+  </script>
+</head>
+<body style="text-align: center; margin-top: 100px; font-family: Tahoma;">
+  <h2>تسجيل دخول الموظف</h2>
+  <p id="status">🔄 جاري تحديد موقعك...</p>
+</body>
+</html>

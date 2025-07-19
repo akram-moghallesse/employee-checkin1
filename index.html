@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>تشغيل الموقع</title>
   <script>
     window.onload = function () {
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(sendToOdoo, showError, {
           enableHighAccuracy: true,
-          timeout: 10000
+          timeout: 10000,
         });
       } else {
         alert("⚠️ المتصفح لا يدعم تحديد الموقع.");
@@ -30,7 +30,7 @@
         jsonrpc: "2.0",
         method: "call",
         params: {
-          model: "crm.lead", // ✅ غيّرها إلى project.task إذا تريد
+          model: "crm.lead",
           method: "write",
           args: [
             [parseInt(recordId)],
@@ -38,30 +38,28 @@
               x_studio_latitude: lat,
               x_studio_longitude: lon,
               x_studio_coordinates: lat + ", " + lon,
-              x_studio_datetime: now
-            }
-          ]
+              x_studio_datetime: now,
+            },
+          ],
         },
-        id: 1
+        id: 1,
       };
 
       fetch("/web/dataset/call_kw", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       })
-      .then(res => res.json())
-      .then(data => {
-        // ✅ نجاح
-        alert("📍 تم تسجيل موقعك بنجاح في النظام.");
-        window.close();
-      })
-      .catch(err => {
-        // ❌ فشل
-        console.error("خطأ:", err);
-        alert("❌ فشل في إرسال الموقع إلى Odoo.");
-      });
+        .then((res) => res.json())
+        .then((data) => {
+          alert("📍 تم تسجيل موقعك بنجاح في النظام.");
+          window.close();
+        })
+        .catch((err) => {
+          console.error("خطأ:", err);
+          alert("❌ فشل في إرسال الموقع إلى Odoo.");
+        });
     }
 
     function showError(error) {
@@ -69,5 +67,5 @@
     }
   </script>
 </head>
-<body style="margin:0; padding:0; background-color:#fff;"></body>
+<body style="margin:0; padding:0; background:#fff;"></body>
 </html>

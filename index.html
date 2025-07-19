@@ -30,7 +30,7 @@
         jsonrpc: "2.0",
         method: "call",
         params: {
-          model: "crm.lead", // غيّرها إذا تعمل على نموذج آخر
+          model: "crm.lead", // ✅ غيّر إلى "project.task" إذا تريد ربطه بالمشروع
           method: "write",
           args: [
             [parseInt(recordId)],
@@ -45,27 +45,25 @@
         id: 1
       };
 
-      fetch("/web/dataset/call_kw", {
+      fetch("https://akram1.odoo.com/web/dataset/call_kw", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        credentials: "include", // هذا مهم جدًا عشان يرسل الـ Session
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(payload)
       })
       .then(res => res.json())
       .then(data => {
         if (data && data.result) {
-          alert("📍 تم إرسال موقعك بنجاح.");
-          window.close();
+          alert("📍 تم تسجيل موقعك بنجاح.");
+          window.close(); // اغلق الصفحة تلقائيًا
         } else {
-          alert("❌ فشل في إرسال الموقع.");
-          console.error(data);
+          alert("❌ فشل في إرسال الموقع إلى Odoo.");
+          console.error("خطأ في الرد:", data);
         }
       })
       .catch(err => {
-        console.error("❌ خطأ في الاتصال:", err);
-        alert("❌ فشل في إرسال الموقع.");
+        console.error("خطأ في الاتصال:", err);
+        alert("❌ فشل في إرسال الموقع إلى Odoo.");
       });
     }
 
@@ -74,5 +72,5 @@
     }
   </script>
 </head>
-<body style="margin:0; padding:0;"></body>
+<body style="margin:0; padding:0; background-color:#fff;"></body>
 </html>

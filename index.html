@@ -30,7 +30,7 @@
         jsonrpc: "2.0",
         method: "call",
         params: {
-          model: "crm.lead", // ✅ غيّر إلى "project.task" إذا تريد ربطه بالمشروع
+          model: "crm.lead",
           method: "write",
           args: [
             [parseInt(recordId)],
@@ -55,14 +55,14 @@
       .then(data => {
         if (data && data.result) {
           alert("📍 تم تسجيل موقعك بنجاح.");
-          window.close(); // اغلق الصفحة تلقائيًا
+          window.close();
         } else {
           alert("❌ فشل في إرسال الموقع إلى Odoo.");
           console.error("خطأ في الرد:", data);
         }
       })
       .catch(err => {
-        console.error("خطأ في الاتصال:", err);
+        console.error("❌ خطأ في الاتصال:", err);
         alert("❌ فشل في إرسال الموقع إلى Odoo.");
       });
     }

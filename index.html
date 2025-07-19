@@ -2,11 +2,11 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>تحديد موقعي</title>
+  <title>تشغيل الموقع</title>
   <script>
     window.onload = function () {
       if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(sendToOdooViaURL, showError, {
+        navigator.geolocation.getCurrentPosition(sendToOdoo, showError, {
           enableHighAccuracy: true,
           timeout: 10000
         });
@@ -15,20 +15,58 @@
       }
     };
 
-    function sendToOdooViaURL(position) {
-      const lat = position.coords.latitude.toFixed(6);
-      const lon = position.coords.longitude.toFixed(6);
+    function sendToOdoo(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      const now = new Date().toISOString().slice(0, 16);
       const recordId = new URLSearchParams(window.location.search).get("id");
 
       if (!recordId) {
-        alert("⚠️ لم يتم تحديد رقم السجل.");
+        alert("⚠️ لم يتم تحديد رقم السجل (id).");
         return;
       }
 
-      const url = `https://akram1.odoo.com/track/location?id=${recordId}&lat=${lat}&lon=${lon}`;
+      const payload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          model: "crm.lead", // غيّرها إذا تعمل على نموذج آخر
+          method: "write",
+          args: [
+            [parseInt(recordId)],
+            {
+              x_studio_latitude: lat,
+              x_studio_longitude: lon,
+              x_studio_coordinates: lat + ", " + lon,
+              x_studio_datetime: now
+            }
+          ]
+        },
+        id: 1
+      };
 
-      // فتح الرابط داخل نافذة جديدة أو نفس النافذة
-      window.location.href = url;
+      fetch("/web/dataset/call_kw", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include", // هذا مهم جدًا عشان يرسل الـ Session
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.result) {
+          alert("📍 تم إرسال موقعك بنجاح.");
+          window.close();
+        } else {
+          alert("❌ فشل في إرسال الموقع.");
+          console.error(data);
+        }
+      })
+      .catch(err => {
+        console.error("❌ خطأ في الاتصال:", err);
+        alert("❌ فشل في إرسال الموقع.");
+      });
     }
 
     function showError(error) {
@@ -36,5 +74,5 @@
     }
   </script>
 </head>
-<body style="margin:0; padding:0; background-color:#fff;"></body>
+<body style="margin:0; padding:0;"></body>
 </html>

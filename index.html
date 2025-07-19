@@ -2,11 +2,11 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>تشغيل الموقع</title>
+  <title>تحديد موقعي</title>
   <script>
     window.onload = function () {
       if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(sendToOdoo, showError, {
+        navigator.geolocation.getCurrentPosition(sendToOdooViaURL, showError, {
           enableHighAccuracy: true,
           timeout: 10000
         });
@@ -15,56 +15,20 @@
       }
     };
 
-    function sendToOdoo(position) {
-      const lat = position.coords.latitude;
-      const lon = position.coords.longitude;
-      const now = new Date().toISOString().slice(0, 16);
+    function sendToOdooViaURL(position) {
+      const lat = position.coords.latitude.toFixed(6);
+      const lon = position.coords.longitude.toFixed(6);
       const recordId = new URLSearchParams(window.location.search).get("id");
 
       if (!recordId) {
-        alert("⚠️ لم يتم تحديد رقم السجل (id).");
+        alert("⚠️ لم يتم تحديد رقم السجل.");
         return;
       }
 
-      const payload = {
-        jsonrpc: "2.0",
-        method: "call",
-        params: {
-          model: "crm.lead", // ✅ غيّر إلى "project.task" إذا تريد ربطه بالمشروع
-          method: "write",
-          args: [
-            [parseInt(recordId)],
-            {
-              x_studio_latitude: lat,
-              x_studio_longitude: lon,
-              x_studio_coordinates: lat + ", " + lon,
-              x_studio_datetime: now
-            }
-          ]
-        },
-        id: 1
-      };
+      const url = `https://akram1.odoo.com/track/location?id=${recordId}&lat=${lat}&lon=${lon}`;
 
-      fetch("https://akram1.odoo.com/web/dataset/call_kw", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload)
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.result) {
-          alert("📍 تم تسجيل موقعك بنجاح.");
-          window.close(); // اغلق الصفحة تلقائيًا
-        } else {
-          alert("❌ فشل في إرسال الموقع إلى Odoo.");
-          console.error("خطأ في الرد:", data);
-        }
-      })
-      .catch(err => {
-        console.error("خطأ في الاتصال:", err);
-        alert("❌ فشل في إرسال الموقع إلى Odoo.");
-      });
+      // فتح الرابط داخل نافذة جديدة أو نفس النافذة
+      window.location.href = url;
     }
 
     function showError(error) {

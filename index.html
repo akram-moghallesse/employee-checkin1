@@ -73,8 +73,29 @@
       input.style.backgroundColor = "#b6f0b6"; // أخضر فاتح قبل النسخ
     }
 
+    function showError(error) {
+      // أنواع الأخطاء الممكنة حسب API الموقع
+      switch(error.code) {
+        case error.PERMISSION_DENIED:
+          alert("⚠️ تم رفض طلب تحديد الموقع. الرجاء تفعيل الموقع من إعدادات المتصفح.");
+          break;
+        case error.POSITION_UNAVAILABLE:
+          alert("⚠️ موقع الجهاز غير متوفر حالياً.");
+          break;
+        case error.TIMEOUT:
+          alert("⚠️ انتهى وقت انتظار تحديد الموقع.");
+          break;
+        default:
+          alert("⚠️ حدث خطأ أثناء تحديد الموقع: " + error.message);
+      }
+    }
+
     function copyCoords() {
       const input = document.getElementById("coords");
+      if(!input.value) {
+        alert("⚠️ لا توجد إحداثيات للنسخ.");
+        return;
+      }
       input.select();
       input.setSelectionRange(0, 99999); // للأجهزة المحمولة
 
@@ -90,10 +111,6 @@
       }
 
       window.getSelection().removeAllRanges();
-    }
-
-    function showError(error) {
-      alert("⚠️ فشل تحديد الموقع: " + error.message);
     }
   </script>
 </head>
